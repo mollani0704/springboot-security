@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.jongseong.content.domain.todo.TodoRepository">
+ 	<insert id="save" parameterType="com.jongseong.content.domain.todo.Todo">
+ 		insert into
+ 			todolist
+ 		values(
+ 			0, 
+ 			#{todocontent},
+ 			0,
+ 			#{importance_flag},
+ 			now(),
+ 			now()
+ 		)
+ 	</insert>
+ 	<select id="getTodoList" parameterType="hashmap" resultType="com.jongseong.content.domain.todo.Todo">
+ 		select 
+ 			tm.todocode,
+ 			
+ 			tm.todocontent,
+ 			tm.todo_complete,
+ 			tm.importance_flag,
+ 			
+ 			tt.total_count,
+ 			tc.incomplete_count,
+ 			
+ 			tm.createdate,
+ 			tm.updatedate
+ 			
+ 		from 
+ 			todolist tm
+			LEFT OUTER JOIN (select
+								COUNT(*) AS total_count
+							FROM 
+								todolist
+							where
+								<choose>
+									<when test='type.equals("importance")'>
+										importance_flag = 1
+									</when>
+									<when test='type.equals("complete")'>
+										todo_complete = 1
+									</when>
+									<when test='type.equals("incomplete")'>
+										todo_complete = 0
+									</when>
+									<otherwise>
+										1 = 1
+									</otherwise>
+								</choose>
+								
+								) tt ON (1 = 1)
+			left outer join (select
+										COUNT(todo_complete) AS incomplete_count
+									from
+										todolist
+									where
+										todo_complete = 0
+										<if test='type.equals("importance")'>
+											and importance_flag = 1
+										</if>
+										) tc on (1=1)
+		where
+			<choose>
+				<when test='type.equals("importance")'>
+					importance_flag = 1
+				</when>
+			    <when test='type.equals("complete")'>
+					todo_complete = 1
+				</when>
+				<when test='type.equals("incomplete")'>
+					todo_complete = 0
+				</when>
+				<otherwise>
+					1 = 1
+				</otherwise>
+			</choose>				
+ 		order by		
+ 			todocode desc
+ 		limit #{index}, #{count};
+ 	</select>
+ 	 
+ 	<update id="updateTodoComplete" parameterType="Integer">
+	 		UPDATE
+				todolist
+			SET
+				todo_complete = case when todo_complete = '0' then 1 ELSE 0 end
+			WHERE
+				todocode = #{todo_code};
+	</update>
+	
+	<update id="updateTodoImportance" parameterType="Integer">
+	 		UPDATE
+				todolist
+			SET
+				importance_flag = case when importance_flag = '0' then 1 ELSE 0 end
+			WHERE
+				todocode = #{todo_code};
+	</update>
+	
+	<update id="updateTodoByTodoCode" parameterType="com.jongseong.content.domain.todo.Todo">
+		update
+			todolist
+		set
+			todocontent = #{todocontent},
+			
+			updatedate = now()
+		where
+			todocode = #{todoCode}; 
+	</update>
+	
+	<delete id="remove" parameterType="Integer">
+		delete
+		from
+			todolist
+		where
+			todocode = #{todo_code}
+	
+	</delete>
+	
+  </mapper>
