@@ -22,11 +22,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable(); //CSRF 토큰 비활성화.
 		http.authorizeRequests() // 요청이 들어오면 인증을 해라
+			.antMatchers("/api/v1/grant/test/user/**")
+			.access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+			
+			.antMatchers("/api/v1/grant/test/manager/**")
+			.access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+			
+			.antMatchers("/api/v1/grant/test/admin/**")
+			.access("hasRole('ROLE_ADMIN')")
+			
 			.antMatchers("/", "/index", "/mypage/**") //우리가 지정한 요청
 			.authenticated() 			// 인증을 거쳐라
+			
 			.anyRequest() // 다른 모든 요청들 -> 다른 모든요청은 모두 접근 권한을 부여하겠다. 
-			.permitAll() // 모든 권한을 줘라
+			.permitAll() // 모든 권한을 줘라.
+			
 			.and()
+			
 			.formLogin()//로그인 방식은 form login을 해라. 로그인 방식 -> 1.jwt토큰 요청, 2.http 기본 요청, 3.form login 요청
 			.loginPage("/auth/signin") // 로그인 페이지는 해당 get요청을 통해 접근. 요청 주소. -> get요청.
 			.loginProcessingUrl("/auth/signin") // 로그인 요청(post요청)
