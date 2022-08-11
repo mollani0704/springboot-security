@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.study.security_jongseong.handler.CustomValidationApiException;
+import com.study.security_jongseong.handler.aop.annotation.Log;
+import com.study.security_jongseong.handler.aop.annotation.Timer;
 import com.study.security_jongseong.service.auth.AuthService;
 import com.study.security_jongseong.service.auth.PrincipalDetailsService;
 import com.study.security_jongseong.web.dto.CMRespDto;
@@ -30,6 +33,8 @@ public class AuthController {
 	private final PrincipalDetailsService principalDetailsService;
 	private final AuthService authService;
 	
+	@Log
+	@Timer
 	@GetMapping("/signup/validation/username")
 	public ResponseEntity<?> checkUsername(@Valid UsernameCheckReqDto usernameCheckReqDto, BindingResult bindingResult) {
 		
@@ -40,7 +45,7 @@ public class AuthController {
 				errorMessage.put(error.getField(), error.getDefaultMessage());
 			});
 			
-			return ResponseEntity.badRequest().body(new CMRespDto<>(-1, "유효성 검사 실패", errorMessage));
+			throw new CustomValidationApiException("유효성 검사 실패", errorMessage);
 		}
 		
 		boolean status = false;
@@ -68,7 +73,8 @@ public class AuthController {
 				errorMessage.put(error.getField(), error.getDefaultMessage());
 			});
 			
-			return ResponseEntity.badRequest().body(new CMRespDto<>(-1, "유효성 검사 실패", errorMessage));
+			throw new CustomValidationApiException("유효성 검사 실패", errorMessage);
+			
 		}
 		try {
 			status = principalDetailsService.addUser(signupReqDto);
