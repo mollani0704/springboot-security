@@ -43,7 +43,7 @@ signupButton.onclick = () => {
 		email : inputs[1].value,
 		username : inputs[2].value,
 		password : inputs[3].value,
-		"usernameCheckFlag": checkUsernameFlag 
+		"checkUsernameFlag": checkUsernameFlag 
 	}
 	
 	$.ajax({
