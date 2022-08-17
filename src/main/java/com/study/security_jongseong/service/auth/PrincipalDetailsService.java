@@ -44,5 +44,4 @@ public class PrincipalDetailsService implements UserDetailsService{
 	
 		return userRepository.save(signupReqDto.toEntity()) > 0;
 	}
-
 }

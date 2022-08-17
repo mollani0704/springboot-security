@@ -54,11 +54,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.and()
 			
 			.oauth2Login()
-			.userInfoEndpoint()
-			.userService(principalOauth2UserService)
+			.userInfoEndpoint() // yml 설정들을 하나하나 실행하게끔 하는 코드.
+			/*
+			 * 1. google, naver, kakao 로그인 요청 -> 코드를 발급해줌.
+			 * 2. 발급받은 코드를 가진 상태로 권한요청(토큰발급요청)을 함.
+			 * 3. 스코프에 등록된 프로필 정보를 가져올 수 있게된다. 
+			 * 4. 해당 정보를 시큐리티의 객체로 전달받음.
+			 */
+			.userService(principalOauth2UserService) // -> 이때 loadUser가 실행됨.(PrincipalOauth2UserService)
 			
 			.and()
-			
+
 			.defaultSuccessUrl("/index");
 		
 //		super.configure(http); -> 기존에 있던 security를 사용하는 것.
