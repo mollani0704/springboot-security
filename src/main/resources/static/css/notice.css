@@ -89,6 +89,11 @@ article {
 
 }
 
+.notice-list {
+    border-collapse: collapse;
+    width: 100%;
+}
+
 .notice-row {
     border-bottom: 1px solid #dbdbdb;
     height: 40px;
