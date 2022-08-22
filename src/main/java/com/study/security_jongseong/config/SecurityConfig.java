@@ -29,7 +29,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable(); //CSRF 토큰 비활성화.
-		http.addFilter(corsFilter); // cors 인증을 하지 않겠다.
+		http.headers()
+			.frameOptions()
+			.disable();
+		
+//		http.addFilter(corsFilter); // cors 인증을 하지 않겠다.
 		http.authorizeRequests() // 요청이 들어오면 인증을 해라
 			.antMatchers("/api/v1/grant/test/user/**")
 			.access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
@@ -40,8 +44,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers("/api/v1/grant/test/admin/**")
 			.access("hasRole('ROLE_ADMIN')")
 			
-			.antMatchers("/", "/index", "/mypage/**") //우리가 지정한 요청
-			.authenticated() 			// 인증을 거쳐라
+			.antMatchers("/", "/index", "/mypage/**", "/notice/addition", "/notice/modification/**") //우리가 지정한 요청
+//			.access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')") 			// 인증을 거쳐라
+			.hasRole("ADMIN")
 			
 			.anyRequest() // 다른 모든 요청들 -> 다른 모든요청은 모두 접근 권한을 부여하겠다. 
 			.permitAll() // 모든 권한을 줘라.

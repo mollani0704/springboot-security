@@ -1,27 +1,17 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항 작성</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/notice-header.css">
+   	<th:block th:replace="/fragments/head"></th:block>
     <link rel="stylesheet" href="/static/css/notice.css">
     <link rel="stylesheet" href="/static/css/notice-insert.css">
     <script type="text/javascript" src="/static/js/service/HuskyEZCreator.js" charset="utf-8"></script>
 </head>
 <body>
-    <header>
-        <nav>
-            <button type="button" class="nav-list">홈</button>
-            <button type="button" class="nav-list">공지사항</button>
-        </nav>
-        <div class="auth-items">
-            <button type="button" class="auth-button signin">로그인</button>
-            <button type="button" class="auth-button signup">회원가입</button>
-        </div>
-    </header>
+	<th:block th:replace="/fragments/header"></th:block>
     <main>
         <div class="notice-header">
             <h1 class="menu-title">새로운 글 작성</h1>
@@ -32,11 +22,11 @@
                 <table class="notice-list">
                     <tr class="notice-row">
                         <th>제목</td>
-                        <td><input type="text" class="notice-title"></td>
+                        <td><input type="text" class="notice-title" name="noticeTitle"></td>
                     </tr>
                     <tr class="notice-row">
                         <td colspan="2">
-                            <input type="file" class="notice-file">
+                            <input type="file" class="notice-file" name="file">
                         </td>
                     </tr>
                     <tr class="notice-row">
@@ -48,7 +38,7 @@
                         <td colspan="2">
                             <div class="notice-submit">
                                 <button type="button" class="notice-button submit">작성하기</button>
-                                <button type="button" class="notice-button cancel">작성하기</button>
+                                <button type="button" class="notice-button cancel">취소하기</button>
                             </div>
                         </td>
                     </tr>
@@ -57,26 +47,8 @@
         </article>
 
     </main>
-    <script type="text/javascript">
-        let oEditors = [];
-        nhn.husky.EZCreator.createInIFrame({
-         oAppRef: oEditors,
-         elPlaceHolder: "ir1",
-         sSkinURI: "/static/SmartEditor2Skin.html",
-         fCreator: "createSEditor2"
-        });
+    <script type="text/javascript" src="/static/notice/notice-insert.js">
 
-        
-        const submitButton = document.querySelector(".submit");
-
-        submitButton.onclick = () => {
-            /*
-                editor의 내용을 textarea롤 옮겨주는 역할
-            */
-            oEditors.getById["ir1"].exec("UPDATE_CONTENTS_FIELD", []);
-           const textareaValue = document.querySelector("#ir1").value;
-            alert(textareaValue)
-        }
     </script>
 </body>
 </html>
