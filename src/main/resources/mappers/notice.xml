@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.study.security_jongseong.domain.notice.NoticeRepository">
+ 	<insert id="saveNotice" parameterType="com.study.security_jongseong.domain.notice.Notice"
+ 		useGeneratedKeys="true" keyProperty="notice_code">
+ 		insert into
+ 			notice_mst
+ 		values(
+ 			0, 
+ 			#{notice_title},
+ 			#{user_code},
+ 			#{notice_content},
+ 			#{notice_count},
+ 			now(),
+ 			now()
+ 		);
+ 	</insert>
+ 	<insert id="saveNoticeFiles" parameterType="java.util.List">
+ 		insert into
+ 			notice_file
+ 		values
+ 		<foreach collection="list" item="file" separator=",">
+ 			
+ 			(
+ 				0,
+ 				#{file.notice_code},
+ 				#{file.file_name},
+ 				now(),
+ 				now()
+ 			)
+ 			
+ 		</foreach>
+ 	</insert>
+ 	
+ 	
+ 	<select id="getNoticeByNoticeCode" parameterType="Integer" 
+ 		resultType="com.study.security_jongseong.domain.notice.Notice">
+ 		SELECT
+			nm.notice_code,
+			nm.notice_title,
+			nm.user_code,
+			um.user_id,
+			nm.notice_content,
+			nf.file_name,
+			nm.create_date
+		FROM 
+			notice_mst nm
+			LEFT OUTER JOIN user_mst um ON(um.user_code = nm.user_code)
+			LEFT OUTER JOIN notice_file nf ON(nf.notice_code
+ 		where
+ 			nm.notice_code = #{notice_code}
+ 	</select>
+ 	
+  </mapper>
