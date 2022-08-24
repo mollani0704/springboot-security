@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import com.study.security_jongseong.domain.notice.Notice;
 import com.study.security_jongseong.domain.notice.NoticeFile;
 import com.study.security_jongseong.domain.notice.NoticeRepository;
 import com.study.security_jongseong.web.dto.notice.AddNoticeReqDto;
+import com.study.security_jongseong.web.dto.notice.GetNoticeResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,5 +81,47 @@ public class NoticeServiceImpl implements NoticeService{
 	
 	}
 		return notice.getNotice_code();
+	}
+
+	@Override
+	public GetNoticeResponseDto getNotice(String flag, int noticeCode) throws Exception {
+		
+		GetNoticeResponseDto getNoticeResponseDto = null;
+		
+		Map<String, Object> reqMap = new HashMap<String, Object>();
+		reqMap.put("flag", flag);
+		reqMap.put("notice_code", noticeCode);
+		
+		List<Notice> notices = noticeRepository.getNotice(reqMap);
+		
+		if(!notices.isEmpty()) {
+		
+			List<Map<String, Object>> downloadFiles = new ArrayList<Map<String,Object>>();
+			notices.forEach(notice -> {
+				Map<String, Object> fileMap = new HashMap<String, Object>();
+				fileMap.put("fileCode", notice.getFile_code());
+				
+				String fileName = notice.getFile_name();
+				fileMap.put("fileName", fileName.substring(fileName.indexOf("_") + 1));
+				
+				downloadFiles.add(fileMap);
+			});
+			
+			Notice firstNotice = notices.get(0);
+			
+			getNoticeResponseDto = GetNoticeResponseDto.builder()
+										.noticeCode(notices.get(0).getNotice_code())
+										.noticeTitle(firstNotice.getNotice_title())
+										.userCode(firstNotice.getUser_code())
+										.userId(firstNotice.getUser_id())
+										.createDate(firstNotice.getCreate_date().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+										.noticeCount(firstNotice.getNotice_count())
+										.noticeContent(firstNotice.getNotice_content())
+										.downloadFiles(downloadFiles)
+										.build();
+			
+		}
+		
+		return getNoticeResponseDto;
 	}
 }

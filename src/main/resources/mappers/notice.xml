@@ -35,7 +35,7 @@
  	</insert>
  	
  	
- 	<select id="getNoticeByNoticeCode" parameterType="Integer" 
+ 	<select id="getNotice" parameterType="hashmap" 
  		resultType="com.study.security_jongseong.domain.notice.Notice">
  		SELECT
 			nm.notice_code,
@@ -48,9 +48,36 @@
 		FROM 
 			notice_mst nm
 			LEFT OUTER JOIN user_mst um ON(um.user_code = nm.user_code)
-			LEFT OUTER JOIN notice_file nf ON(nf.notice_code
+			LEFT OUTER JOIN notice_file nf ON(nf.notice_code = nm.notice_code)
  		where
- 			nm.notice_code = #{notice_code}
+ 		<choose>
+ 		 	<when test='flag == null'>		
+	 			nm.notice_code = #{notice_code}
+ 			</when>
+ 			<when test='flag.equals("pre")'>
+ 				
+ 				nm.notice_code = (
+ 					select
+ 						max(notice_code)
+ 					from
+ 						notice_mst
+ 					where
+ 						notice_code &lt; #{notice_code}
+ 				)
+ 				
+ 			</when>
+			<otherwise>
+			
+					nm.notice_code = (
+ 					select
+ 						min(notice_code)
+ 					from
+ 						notice_mst
+ 					where
+ 						notice_code &gt; #{notice_code}
+ 				)
+ 				
+			</otherwise>
+ 		</choose>
  	</select>
- 	
   </mapper>
