@@ -21,6 +21,7 @@ import com.study.security_jongseong.domain.notice.Notice;
 import com.study.security_jongseong.domain.notice.NoticeFile;
 import com.study.security_jongseong.domain.notice.NoticeRepository;
 import com.study.security_jongseong.web.dto.notice.AddNoticeReqDto;
+import com.study.security_jongseong.web.dto.notice.GetNoticeListResponseDto;
 import com.study.security_jongseong.web.dto.notice.GetNoticeResponseDto;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,25 @@ public class NoticeServiceImpl implements NoticeService{
 	
 	@Value("${file.path}")
 	private String filePath;
+	
+	@Override
+	public List<GetNoticeListResponseDto> getNoticeList(int page, String searchFlag, String searchValue) throws Exception {
+		
+		int index = (page - 1) * 10;
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("index", index);
+		map.put("search_flag", searchFlag);
+		map.put("search_value", searchValue == null ? "" : searchValue);
+		
+		List<GetNoticeListResponseDto> list = new ArrayList<GetNoticeListResponseDto>();
+		
+		noticeRepository.getNoticeList(map).forEach(notice -> {
+			list.add(notice.toListDto());
+		});
+		
+		return list;
+	}
 	
 	@Override
 	public int addNotice(AddNoticeReqDto addNoticeReqDto) throws Exception {
@@ -67,7 +87,7 @@ public class NoticeServiceImpl implements NoticeService{
 			}
 			
 			try {
-				Files.write(uploadPath, file.getBytes());
+				Files.write(uploadPath, file.getBytes()); 
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -92,6 +112,7 @@ public class NoticeServiceImpl implements NoticeService{
 		reqMap.put("flag", flag);
 		reqMap.put("notice_code", noticeCode);
 		
+		noticeRepository.countIncrement(reqMap);
 		List<Notice> notices = noticeRepository.getNotice(reqMap);
 		
 		if(!notices.isEmpty()) {
@@ -99,10 +120,13 @@ public class NoticeServiceImpl implements NoticeService{
 			List<Map<String, Object>> downloadFiles = new ArrayList<Map<String,Object>>();
 			notices.forEach(notice -> {
 				Map<String, Object> fileMap = new HashMap<String, Object>();
-				fileMap.put("fileCode", notice.getFile_code());
-				
+			
 				String fileName = notice.getFile_name();
-				fileMap.put("fileName", fileName.substring(fileName.indexOf("_") + 1));
+				if(fileName != null) {
+					fileMap.put("fileCode", notice.getFile_code());
+					fileMap.put("fileOriginName", fileName.substring(fileName.indexOf("_") + 1));
+					fileMap.put("fileTempName", fileName);
+				}
 				
 				downloadFiles.add(fileMap);
 			});
@@ -124,4 +148,6 @@ public class NoticeServiceImpl implements NoticeService{
 		
 		return getNoticeResponseDto;
 	}
+
+
 }

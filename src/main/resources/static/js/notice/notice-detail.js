@@ -16,7 +16,6 @@ function load(uri) {
 		url: uri + noticeCode,
 		dataType: "json",
 		success: (response) => {
-			console.log(JSON.stringify(response.data))
 			getNotice(response.data);
 		}, 
 		
@@ -44,9 +43,10 @@ function getNotice(notice) {
 	let noticeFileArray = new Array();
 	
 	notice.downloadFiles.forEach(file => {
-		noticeFileArray.push(`
-			<a href="/api/v1/notice/file/${file.fileCode}">${file.fileName}</a>
-		`);
+		if(file.fileCode != undefined) {			
+			noticeFileArray.push(`
+				<a href="/api/v1/notice/file/download/${file.fileTempName}">${file.fileOriginName}</a>`);
+		}
 	});
 	
 	noticeFile.innerHTML += noticeFileArray.join(" / ");
