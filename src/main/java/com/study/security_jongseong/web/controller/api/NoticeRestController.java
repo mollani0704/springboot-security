@@ -43,10 +43,12 @@ public class NoticeRestController {
 	private final NoticeService noticeService;
 	
 	
-	@GetMapping("/list")
+	@GetMapping("/list/{page}")
 	public ResponseEntity<?> getNoticeList(@PathVariable int page, @RequestParam String searchFlag ,@RequestParam String searchValue) {
 		
 		List<GetNoticeListResponseDto> listDto = null;
+		
+		log.info("{}, {}", searchFlag, searchValue);
 		
 		try {
 			listDto = noticeService.getNoticeList(page, searchFlag, searchValue);

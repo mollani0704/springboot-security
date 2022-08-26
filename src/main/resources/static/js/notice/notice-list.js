@@ -19,7 +19,8 @@ function load(nowPage) {
 		},
 		dataType: "json",
 		success: (response) => {
-			getList(response);
+			console.log(response)
+			getList(response.data);
 		},
 		error: (error) => {
 			console.log(error);
